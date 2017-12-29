@@ -71,7 +71,7 @@ class HomeScreen extends React.Component {
     const redirectUrl = AuthSession.getRedirectUrl();
     const result = await AuthSession.startAsync({
       authUrl:
-        'https://ucl-find-free-room.eu.ngrok.io/oauth/uclapi/login' +
+        'https://room-buddy.uclapi.com/oauth/uclapi/login' +
         `&redirect_uri=${encodeURIComponent(redirectUrl)}`,
     });
     this.setState({ result }, async () => {
@@ -102,7 +102,7 @@ class HomeScreen extends React.Component {
     }
     const client = new ApolloClient({
       link: new HttpLink({
-        uri: 'https://ucl-find-free-room.eu.ngrok.io/graphql',
+        uri: 'https://room-buddy.uclapi.com/graphql',
         headers: {
           authorization: this.state.token,
         },

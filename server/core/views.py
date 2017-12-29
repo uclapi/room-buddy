@@ -79,7 +79,7 @@ def oauth_callback(request):
         token = user.token
 
     # Redirect back to user mobile app with veruto token
-    url = "https://auth.expo.io/@wilhelmklopp/ucl-find-free-room"
+    url = "https://auth.expo.io/@wilhelmklopp/uclroombuddy"
     return redirect(
         '{}?token={}'.format(url, token)
     )
