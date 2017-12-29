@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-filename-extension */
 import React from 'react';
-import { View, Button, Text, StyleSheet } from 'react-native';
+import { View, TouchableHighlight, Text, StyleSheet, Image } from 'react-native';
 import { StackNavigator, addNavigationHelpers } from 'react-navigation';
 import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
@@ -60,7 +60,6 @@ class HomeScreen extends React.Component {
     } catch (e) {
       // pass
     }
-    console.log(token);
     if (token) {
       this.setState({ token });
       this.props.login();
@@ -93,7 +92,9 @@ class HomeScreen extends React.Component {
     if (!this.props.loggedIn) {
       return (
         <View style={styles.container}>
-          <Button title="Log in with UCL" onPress={this.handlePressAsync} />
+          <TouchableHighlight onPress={this.handlePressAsync}>
+            <Image source={require('./assets/signinwithucl.png')} />
+          </TouchableHighlight>
           <If condition={this.state.showErrorMessage}>
             <Text>{`An error has occured. Please try again (Error: ${this.state.result.type})`}</Text>
           </If>
