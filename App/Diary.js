@@ -4,6 +4,7 @@ import {
   View,
   StyleSheet,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
@@ -12,6 +13,9 @@ import Table from 'react-native-simple-table';
 import Moment from 'moment';
 import { Text } from 'native-base';
 
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = width - (0.2 * width);
+const AVAILABLE_WIDTH = CARD_WIDTH - 30; // 30 is padding in Card from native-base
 
 const styles = StyleSheet.create({
   loading: {
@@ -39,12 +43,12 @@ const columns = [
   {
     title: 'Description',
     dataIndex: 'description',
-    width: 150,
+    width: (AVAILABLE_WIDTH - (50 + 50)) * 0.6,
   },
   {
     title: 'Contact',
     dataIndex: 'contact',
-    width: 110,
+    width: (AVAILABLE_WIDTH - (50 + 50)) * 0.4,
   },
 ];
 
