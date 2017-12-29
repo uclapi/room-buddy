@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-filename-extension */
 import React from 'react';
-import { View, TouchableHighlight, Text, StyleSheet, Image } from 'react-native';
+import { View, TouchableHighlight, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
 import { StackNavigator, addNavigationHelpers } from 'react-navigation';
 import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
@@ -36,12 +36,13 @@ class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
     title: 'UCL Room Buddy',
     headerRight: (
-      <FontAwesome
-        style={styles.settingsIcon}
-        name="gear"
-        size={32}
-        onPress={() => navigation.navigate('Settings')}
-      />
+      <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+        <FontAwesome
+          style={styles.settingsIcon}
+          name="gear"
+          size={32}
+        />
+      </TouchableOpacity>
     ),
   })
   constructor(props) {

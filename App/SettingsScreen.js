@@ -8,6 +8,9 @@ import PropTypes from 'prop-types';
 import { logout } from './actions';
 
 class SettingsScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Settings',
+  }
   constructor(props) {
     super(props);
     this.handleLogout = this.handleLogout.bind(this);
