@@ -11,8 +11,7 @@
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "resizeMode": "cover",
     },
     "ios": {
       "bundleIdentifier": "com.uclapi.uclroombuddy",
@@ -20,7 +19,7 @@
     },
     "android": {
       "package": "com.uclapi.uclroombuddy",
-      "permissions": ["ACCESS_COARSE_LOCATION"],
+      "permissions": ["ACCESS_FINE_LOCATION"],
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyDLowlRZaFWOfp_gv8aOmVT7b_9phchtOg"
