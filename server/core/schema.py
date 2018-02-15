@@ -59,6 +59,14 @@ class Query(graphene.ObjectType):
         else:
             rooms = helpers.fetch_free_rooms()
 
+        def get_coords(room):
+            if "coordinates" in room["location"]:
+                return Coordinates(
+                    lat=room["location"]["coordinates"]["lat"],
+                    lng=room["location"]["coordinates"]["lng"]
+                )
+            else:
+                return None
         return [
             Room(
                 automated=room["automated"],
@@ -80,10 +88,7 @@ class Query(graphene.ObjectType):
                 ],
                 location=Location(
                     address=room["location"]["address"],
-                    coordinates=Coordinates(
-                        lat=room["location"]["coordinates"]["lat"],
-                        lng=room["location"]["coordinates"]["lng"]
-                    )
+                    coordinates=get_coords(room)
                 ),
                 roomid=room["roomid"],
                 roomname=room["roomname"],
