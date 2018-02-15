@@ -83,6 +83,7 @@ class App extends React.Component {
       },
     };
     this.receivedNewUserLocation = this.receivedNewUserLocation.bind(this);
+    this.getUserLocation = this.getUserLocation.bind(this);
   }
 
   componentWillMount() {
@@ -114,7 +115,7 @@ class App extends React.Component {
           this.index = index;
           this.setState({ roomInFocus: this.state.rooms[index] });
           this.map.animateToRegion(
-            calculateRegion(this.state.rooms[index], this.state.userLocation),
+            calculateRegion(this.state.rooms[index], this.getUserLocation()),
             350,
           );
         }
@@ -124,21 +125,11 @@ class App extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (!nextProps.data.loading) {
-      let sortedRooms;
-      if (this.state.userLocation) {
-        sortedRooms = sortRooms(nextProps.data.freeRooms, this.state.userLocation);
-      } else {
-        sortedRooms = sortRooms(nextProps.data.freeRooms, {
-          coords: {
-            lat: this.state.region.latitude,
-            lng: this.state.region.longitude,
-          },
-        });
-      }
+      const sortedRooms = sortRooms(nextProps.data.freeRooms, this.getUserLocation());
       this.setState({
         roomInFocus: sortedRooms[0],
         rooms: sortedRooms,
-        region: calculateRegion(sortedRooms[0], this.state.userLocation),
+        region: calculateRegion(sortedRooms[0], this.getUserLocation()),
       });
     }
   }
@@ -151,6 +142,7 @@ class App extends React.Component {
   async getPath(startLoc, destinationLoc) {
     const resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${destinationLoc}&mode=walking`);
     const respJson = await resp.json();
+    // console.log(respJson);
     const points = Polyline.decode(respJson.routes[0].overview_polyline.points);
     const coords = points.map(point => (
       {
@@ -159,6 +151,18 @@ class App extends React.Component {
       }
     ));
     this.setState({ coordsToRoomInFocus: coords });
+  }
+
+  getUserLocation() {
+    if (this.state.userLocation) {
+      return this.state.userLocation;
+    }
+    return {
+      coords: {
+        latitude: this.state.region.latitude,
+        longitude: this.state.region.longitude,
+      },
+    };
   }
 
   receivedNewUserLocation(userLocation) {
@@ -181,7 +185,8 @@ class App extends React.Component {
       <View style={styles.container}>
         <MapView
           ref={map => this.map = map}
-          initialRegion={this.state.region}
+          region={this.state.region}
+          onRegionChange={region => this.setState({ region })}
           style={styles.container}
           showsUserLocation
           showsIndoors
