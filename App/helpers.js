@@ -51,7 +51,8 @@ const sortRooms = (freeRooms, position) => {
     return -1;
   });
 
-  return rooms;
+  // Only return the 15 closest rooms
+  return rooms.slice(0, 15);
 };
 
 function calculateRegion(roomInput, userLocation) {
