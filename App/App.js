@@ -82,16 +82,23 @@ class App extends React.Component {
         longitudeDelta: 0.00421,
       },
     };
-    this.getLocationAsync = this.getLocationAsync.bind(this);
+    this.receivedNewUserLocation = this.receivedNewUserLocation.bind(this);
   }
 
   componentWillMount() {
     this.index = 0;
     this.animation = new Animated.Value(0);
-    this.getLocationAsync();
   }
 
   async componentDidMount() {
+    const { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status === 'granted') {
+      this.watch = await Location.watchPositionAsync({
+        enableHighAccuracy: true,
+        distanceInterval: 100,
+      }, this.receivedNewUserLocation);
+    }
+
     this.animation.addListener(({ value }) => {
       let index = Math.floor((value / CARD_WIDTH) + 0.3);
       if (index >= this.state.rooms.length) {
@@ -117,7 +124,17 @@ class App extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (!nextProps.data.loading) {
-      const sortedRooms = sortRooms(nextProps.data.freeRooms, this.state.userLocation);
+      let sortedRooms;
+      if (this.state.userLocation) {
+        sortedRooms = sortRooms(nextProps.data.freeRooms, this.state.userLocation);
+      } else {
+        sortedRooms = sortRooms(nextProps.data.freeRooms, {
+          coords: {
+            lat: this.state.region.latitude,
+            lng: this.state.region.longitude,
+          },
+        });
+      }
       this.setState({
         roomInFocus: sortedRooms[0],
         rooms: sortedRooms,
@@ -126,16 +143,8 @@ class App extends React.Component {
     }
   }
 
-  async getLocationAsync() {
-    const { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== 'granted') {
-      this.setState({
-        errorMessage: 'Permission to access location was denied',
-      });
-    }
-
-    const userLocation = await Location.getCurrentPositionAsync({ maximumAge: 10 * 60 * 1000 });
-    this.setState({ userLocation });
+  componentWillUnmount() {
+    this.watch.remove();
   }
 
   // https://medium.com/@ali_oguzhan/react-native-maps-with-google-directions-api-bc716ed7a366
@@ -152,21 +161,22 @@ class App extends React.Component {
     this.setState({ coordsToRoomInFocus: coords });
   }
 
+  receivedNewUserLocation(userLocation) {
+    this.setState({ userLocation });
+  }
+
   render() {
-    if (this.state.errorMessage) {
-      return (
-        <Alert>{this.state.errorMessage}</Alert>
-      );
-    }
     if (this.props.data.loading) {
       return (
         <Text>Loading</Text>
       );
     }
-    this.getPath(
-      `${this.state.userLocation.coords.latitude},${this.state.userLocation.coords.longitude}`,
-      `${this.state.roomInFocus.location.coordinates.lat},${this.state.roomInFocus.location.coordinates.lng}`,
-    );
+    if (this.state.userLocation) {
+      this.getPath(
+        `${this.state.userLocation.coords.latitude},${this.state.userLocation.coords.longitude}`,
+        `${this.state.roomInFocus.location.coordinates.lat},${this.state.roomInFocus.location.coordinates.lng}`,
+      );
+    }
     return (
       <View style={styles.container}>
         <MapView
@@ -185,15 +195,17 @@ class App extends React.Component {
                   longitude: Number(room.location.coordinates.lng),
                 }
               }
-              pinColor={isRoomLocationEqual(room, this.state.roomInFocus) ? 'red' : 'black'}
+              pinColor={isRoomLocationEqual(room, this.state.roomInFocus) ? '#FF0000' : '#000000'}
               title={room.roomname}
             />
           ))}
-          <MapView.Polyline
-            coordinates={this.state.coordsToRoomInFocus}
-            strokeWidth={2}
-            strokeColor="red"
-          />
+          <If condition={this.state.coordsToRoomInFocus}>
+            <MapView.Polyline
+              coordinates={this.state.coordsToRoomInFocus}
+              strokeWidth={2}
+              strokeColor="red"
+            />
+          </If>
         </MapView>
         <Animated.ScrollView
           horizontal
