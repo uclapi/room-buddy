@@ -17,7 +17,11 @@ const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
 };
 
 const sortRooms = (freeRooms, position) => {
-  const rooms = freeRooms.map((room) => {
+  let rooms;
+  rooms = freeRooms.filter(room => (
+    room.location.coordinates
+  ));
+  rooms = rooms.map((room) => {
     const distance = getDistanceFromLatLonInKm(
       position.coords.latitude,
       position.coords.longitude,
