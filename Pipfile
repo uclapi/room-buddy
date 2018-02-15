@@ -16,10 +16,13 @@ graphene = "*"
 "ciso8601" = "*"
 pytz = "*"
 gunicorn = "*"
+opbeat = "*"
 
 
 [dev-packages]
 
 
+
 [requires]
+
 python_version = "3.6"

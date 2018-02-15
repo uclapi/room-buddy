@@ -52,6 +52,18 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+if DEBUG:
+    INSTALLED_APPS.append('opbeat.contrib.django')
+    MIDDLEWARE.insert(
+        0,
+        'opbeat.contrib.django.middleware.OpbeatAPMMiddleware'
+    )
+    OPBEAT = {
+        'ORGANIZATION_ID': os.environ["OPBEAT_ORGANIZATION_ID"],
+        'APP_ID': os.environ["OPBEAT_APP_ID"],
+        'SECRET_TOKEN': os.environ["OPBEAT_SECRET_TOKEN"]
+    }
+
 ROOT_URLCONF = 'server.urls'
 
 TEMPLATES = [
