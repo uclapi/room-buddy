@@ -6,7 +6,7 @@ import {
   View,
   StyleSheet,
   Animated,
-  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { Location, Permissions, MapView } from 'expo';
@@ -70,20 +70,22 @@ function isRoomLocationEqual(room1, room2) {
   );
 }
 
+const bloomsbury = {
+  latitude: 51.5245625,
+  longitude: -0.1362288,
+  latitudeDelta: 0.00922,
+  longitudeDelta: 0.00421,
+};
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      region: {
-        latitude: 51.5245625,
-        longitude: -0.1362288,
-        latitudeDelta: 0.00922,
-        longitudeDelta: 0.00421,
-      },
+      region: bloomsbury,
     };
     this.receivedNewUserLocation = this.receivedNewUserLocation.bind(this);
     this.getUserLocation = this.getUserLocation.bind(this);
+    this.setMarkerRef = this.setMarkerRef.bind(this);
   }
 
   componentWillMount() {
@@ -101,6 +103,7 @@ class App extends React.Component {
     }
 
     this.animation.addListener(({ value }) => {
+      console.log(value)
       let index = Math.floor((value / CARD_WIDTH) + 0.3);
       if (index >= this.state.rooms.length) {
         index = this.state.rooms.length - 1;
@@ -108,9 +111,11 @@ class App extends React.Component {
       if (index <= 0) {
         index = 0;
       }
+      console.log('pre-timeout', index);
 
       clearTimeout(this.regionTimeout);
       this.regionTimeout = setTimeout(() => {
+        console.log('timeout', index);
         if (this.index !== index) {
           this.index = index;
           this.setState({ roomInFocus: this.state.rooms[index] });
@@ -118,6 +123,8 @@ class App extends React.Component {
             calculateRegion(this.state.rooms[index], this.getUserLocation()),
             350,
           );
+          this.markers.map(marker => marker.hideCallout());
+          this.markers[index].showCallout();
         }
       }, 10);
     });
@@ -159,10 +166,20 @@ class App extends React.Component {
     }
     return {
       coords: {
-        latitude: this.state.region.latitude,
-        longitude: this.state.region.longitude,
+        latitude: bloomsbury.latitude,
+        longitude: bloomsbury.longitude,
       },
     };
+  }
+
+  setMarkerRef(ref, index) {
+    if (!this.markers) {
+      this.markers = [];
+      this.markers[index] = ref;
+      this.markers[index].showCallout();
+    } else {
+      this.markers[index] = ref;
+    }
   }
 
   receivedNewUserLocation(userLocation) {
@@ -172,7 +189,9 @@ class App extends React.Component {
   render() {
     if (this.props.data.loading) {
       return (
-        <Text>Loading</Text>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color="#8e1c1c" />
+        </View>
       );
     }
     if (this.state.userLocation) {
@@ -185,13 +204,12 @@ class App extends React.Component {
       <View style={styles.container}>
         <MapView
           ref={map => this.map = map}
-          region={this.state.region}
-          onRegionChange={region => this.setState({ region })}
+          initialRegion={this.state.region}
           style={styles.container}
           showsUserLocation
           showsIndoors
         >
-          {this.state.rooms.map(room => (
+          {this.state.rooms.map((room, index) => (
             <MapView.Marker
               key={`${room.siteid}-${room.roomid}-${room.classification}`}
               coordinate={
@@ -202,6 +220,7 @@ class App extends React.Component {
               }
               pinColor={isRoomLocationEqual(room, this.state.roomInFocus) ? '#FF0000' : '#000000'}
               title={room.roomname}
+              ref={ref => this.setMarkerRef(ref, index)}
             />
           ))}
           <If condition={this.state.coordsToRoomInFocus}>
@@ -237,11 +256,7 @@ class App extends React.Component {
               <CardItem>
                 <Body>
                   <Text style={styles.cardTitle}>{room.roomname}</Text>
-                  <Choose>
-                    <When condition={isRoomEqual(room, this.state.roomInFocus)}>
-                      <Diary room={room} />
-                    </When>
-                  </Choose>
+                  <Diary room={room} />
                 </Body>
               </CardItem>
             </Card>
