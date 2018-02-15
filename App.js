@@ -6,7 +6,7 @@ import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloProvider } from 'react-apollo';
-import { AuthSession, SecureStore, Constants } from 'expo';
+import { AuthSession, SecureStore, Constants, AppLoading } from 'expo';
 import { FontAwesome } from '@expo/vector-icons';
 import { Provider, connect } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
@@ -51,10 +51,12 @@ class HomeScreen extends React.Component {
     this.state = {
       result: null,
       showErrorMessage: false,
+      loadingTokenFromStorage: true,
     };
+    this.loadTokenFromStorage = this.loadTokenFromStorage.bind(this);
   }
 
-  async componentWillMount() {
+  async loadTokenFromStorage() {
     let token;
     try {
       token = await SecureStore.getItemAsync('token');
@@ -90,6 +92,15 @@ class HomeScreen extends React.Component {
   };
 
   render() {
+    if (this.state.loadingTokenFromStorage) {
+      return (
+        <AppLoading
+          startAsync={this.loadTokenFromStorage}
+          onFinish={() => this.setState({ loadingTokenFromStorage: false })}
+          onError={console.warn}
+        />
+      );
+    }
     if (!this.props.loggedIn) {
       return (
         <View style={styles.container}>
