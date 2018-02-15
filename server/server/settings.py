@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-if DEBUG:
+if not DEBUG:
     INSTALLED_APPS.append('opbeat.contrib.django')
     MIDDLEWARE.insert(
         0,
