@@ -103,7 +103,6 @@ class App extends React.Component {
     }
 
     this.animation.addListener(({ value }) => {
-      console.log(value)
       let index = Math.floor((value / CARD_WIDTH) + 0.3);
       if (index >= this.state.rooms.length) {
         index = this.state.rooms.length - 1;
@@ -111,11 +110,9 @@ class App extends React.Component {
       if (index <= 0) {
         index = 0;
       }
-      console.log('pre-timeout', index);
 
       clearTimeout(this.regionTimeout);
       this.regionTimeout = setTimeout(() => {
-        console.log('timeout', index);
         if (this.index !== index) {
           this.index = index;
           this.setState({ roomInFocus: this.state.rooms[index] });
