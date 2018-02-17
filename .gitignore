@@ -3,6 +3,7 @@ node_modules/**/*
 npm-debug.*
 
 .env
+app.json
 
 
 __pycache__

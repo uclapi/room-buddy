@@ -11,11 +11,17 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Provider, connect } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import PropTypes from 'prop-types';
+import Sentry from 'sentry-expo';
+import DoubleTap from 'react-native-hardskilled-double-tap';
 
 import App from './App/App';
-import SettingsScreen from './App/SettingsScreen';
 import { loggedIn } from './App/reducers';
 import { logout, login } from './App/actions';
+
+// Remove this once Sentry is correctly setup.
+Sentry.enableInExpoDevelopment = true;
+
+Sentry.config('https://3ffc3641cff24a3cbfb376f347a02240@sentry.io/289925').install();
 
 const styles = StyleSheet.create({
   container: {
@@ -23,26 +29,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  settingsIcon: {
+  hiddenLogout: {
     marginRight: 10,
   },
 });
-// Todo: use official log in with UCL button
+
 class HomeScreen extends React.Component {
   static propTypes = {
     login: PropTypes.func.isRequired,
     loggedIn: PropTypes.bool.isRequired,
+    logout: PropTypes.func.isRequired,
   }
   static navigationOptions = ({ navigation }) => ({
     title: 'UCL Room Buddy',
     headerRight: (
-      <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-        <FontAwesome
-          style={styles.settingsIcon}
-          name="gear"
-          size={32}
-        />
-      </TouchableOpacity>
+      <DoubleTap
+        onPress={async () => navigation.state.params.logout()}
+        delay={500}
+        style={styles.hiddenLogout}
+      >
+        <Text style={{ color: 'white' }}>Hidden text</Text>
+      </DoubleTap>
     ),
   })
   constructor(props) {
@@ -54,6 +61,16 @@ class HomeScreen extends React.Component {
       loadingTokenFromStorage: true,
     };
     this.loadTokenFromStorage = this.loadTokenFromStorage.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
+  }
+
+  componentDidMount() {
+    this.props.navigation.setParams({ logout: this.handleLogout });
+  }
+
+  async handleLogout() {
+    SecureStore.deleteItemAsync('token');
+    this.props.logout();
   }
 
   async loadTokenFromStorage() {
@@ -144,9 +161,6 @@ const AppNavigator = StackNavigator(
   {
     Home: {
       screen: connect(mapStateToProps, mapDispatchToProps)(HomeScreen),
-    },
-    Settings: {
-      screen: SettingsScreen,
     },
   },
   { navigationOptions: { headerStyle: { marginTop: Constants.statusBarHeight } } },
