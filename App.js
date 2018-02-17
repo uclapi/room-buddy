@@ -18,9 +18,6 @@ import App from './App/App';
 import { loggedIn } from './App/reducers';
 import { logout, login } from './App/actions';
 
-// Remove this once Sentry is correctly setup.
-Sentry.enableInExpoDevelopment = true;
-
 Sentry.config('https://3ffc3641cff24a3cbfb376f347a02240@sentry.io/289925').install();
 
 const styles = StyleSheet.create({
