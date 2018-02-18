@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "uclroombuddy",
-    "description": "This project is really great.",
+    "name": "UCL Room Buddy",
+    "description": "Find the closest free room in UCL.",
     "slug": "uclroombuddy",
     "privacy": "public",
     "sdkVersion": "24.0.0",
