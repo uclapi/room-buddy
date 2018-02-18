@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-filename-extension */
 import React from 'react';
-import { View, TouchableHighlight, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
 import { StackNavigator, addNavigationHelpers } from 'react-navigation';
 import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
@@ -40,13 +40,12 @@ class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
     title: 'UCL Room Buddy',
     headerRight: (
-      <DoubleTap
-        onPress={async () => navigation.state.params.logout()}
-        delay={500}
+      <TouchableOpacity
+        onLongPress={async () => navigation.state.params.logout()}
         style={styles.hiddenLogout}
       >
-        <Text style={{ color: 'white' }}>Hidden text</Text>
-      </DoubleTap>
+        <Text style={{ color: 'transparent' }}>Hidden signout</Text>
+      </TouchableOpacity>
     ),
   })
   constructor(props) {
@@ -118,9 +117,9 @@ class HomeScreen extends React.Component {
     if (!this.props.loggedIn) {
       return (
         <View style={styles.container}>
-          <TouchableHighlight onPress={this.handlePressAsync}>
+          <TouchableOpacity onPress={this.handlePressAsync}>
             <Image source={require('./assets/signinwithucl.png')} />
-          </TouchableHighlight>
+          </TouchableOpacity>
           <If condition={this.state.showErrorMessage}>
             <Text>{`An error has occured. Please try again (Error: ${this.state.result.type})`}</Text>
           </If>
