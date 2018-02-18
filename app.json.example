@@ -11,7 +11,8 @@
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "cover",
+      "resizeMode": "contain",
+      "backgroundColor": "#5e6683"
     },
     "ios": {
       "bundleIdentifier": "com.uclapi.uclroombuddy",
