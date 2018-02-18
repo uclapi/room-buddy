@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-filename-extension */
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, Image, Button } from 'react-native';
 import { StackNavigator, addNavigationHelpers } from 'react-navigation';
 import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
@@ -12,11 +12,11 @@ import { Provider, connect } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import PropTypes from 'prop-types';
 import Sentry from 'sentry-expo';
-import DoubleTap from 'react-native-hardskilled-double-tap';
 
 import App from './App/App';
 import { loggedIn } from './App/reducers';
 import { logout, login } from './App/actions';
+const signInButton = require('./assets/signin.png');
 
 Sentry.config('https://3ffc3641cff24a3cbfb376f347a02240@sentry.io/289925').install();
 
@@ -82,7 +82,7 @@ class HomeScreen extends React.Component {
     }
   }
 
-  handlePressAsync = async () => {
+  startLogin = async () => {
     const redirectUrl = AuthSession.getRedirectUrl();
     const result = await AuthSession.startAsync({
       authUrl:
@@ -117,9 +117,7 @@ class HomeScreen extends React.Component {
     if (!this.props.loggedIn) {
       return (
         <View style={styles.container}>
-          <TouchableOpacity onPress={this.handlePressAsync}>
-            <Image source={require('./assets/signinwithucl.png')} />
-          </TouchableOpacity>
+          <Button title="Sign in with UCL" onPress={this.startLogin} />
           <If condition={this.state.showErrorMessage}>
             <Text>{`An error has occured. Please try again (Error: ${this.state.result.type})`}</Text>
           </If>
