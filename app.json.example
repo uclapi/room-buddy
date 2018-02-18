@@ -12,7 +12,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#5e6683"
+      "backgroundColor": "#616781"
     },
     "ios": {
       "bundleIdentifier": "com.uclapi.uclroombuddy",
