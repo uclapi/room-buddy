@@ -86,6 +86,7 @@ class Diary extends React.Component {
             animating={this.props.data.loading}
             style={styles.loading}
             size="large"
+            color="#8e1c1c"
           />
         </When>
         <When
