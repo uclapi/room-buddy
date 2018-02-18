@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-filename-extension */
 import React from 'react';
 import {
-  Button,
+  NetInfo,
   Dimensions,
   View,
   StyleSheet,
@@ -82,6 +82,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       region: bloomsbury,
+      isConnected: true,
     };
     this.receivedNewUserLocation = this.receivedNewUserLocation.bind(this);
     this.getUserLocation = this.getUserLocation.bind(this);
@@ -126,6 +127,16 @@ class App extends React.Component {
         }
       }, 10);
     });
+
+    NetInfo.isConnected.addEventListener(
+      'connectionChange',
+      (async (isConnected) => {
+        if (isConnected && !this.state.isConnected) {
+          await this.props.data.refetch();
+        }
+        return this.setState({ isConnected });
+      }),
+    );
   }
 
   componentWillReceiveProps(nextProps) {
@@ -193,6 +204,11 @@ class App extends React.Component {
     }
     return (
       <View style={styles.container}>
+        <If condition={!this.state.isConnected}>
+          <View style={{ backgroundColor: 'red', paddingBottom: 5, paddingTop: 5 }}>
+            <Text style={{ textAlign: 'center' }}>Lost network connection</Text>
+          </View>
+        </If>
         <MapView
           ref={map => this.map = map}
           initialRegion={this.state.region}
