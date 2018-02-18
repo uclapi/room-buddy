@@ -19,7 +19,7 @@
       "supportsTablet": true
     },
     "android": {
-      "versionCode": "2",
+      "versionCode": 2,
       "package": "com.uclapi.uclroombuddy",
       "permissions": ["ACCESS_FINE_LOCATION"],
       "config": {
