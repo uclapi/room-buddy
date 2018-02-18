@@ -91,6 +91,7 @@ class App extends React.Component {
   componentWillMount() {
     this.index = 0;
     this.animation = new Animated.Value(0);
+    this.markers = [];
   }
 
   async componentDidMount() {
@@ -184,14 +185,7 @@ class App extends React.Component {
   }
 
   render() {
-    if (this.props.data.loading) {
-      return (
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-          <ActivityIndicator size="large" color="#8e1c1c" />
-        </View>
-      );
-    }
-    if (this.state.userLocation) {
+    if (this.state.userLocation && !this.props.data.loading) {
       this.getPath(
         `${this.state.userLocation.coords.latitude},${this.state.userLocation.coords.longitude}`,
         `${this.state.roomInFocus.location.coordinates.lat},${this.state.roomInFocus.location.coordinates.lng}`,
@@ -206,59 +200,70 @@ class App extends React.Component {
           showsUserLocation
           showsIndoors
         >
-          {this.state.rooms.map((room, index) => (
-            <MapView.Marker
-              key={`${room.siteid}-${room.roomid}-${room.classification}`}
-              coordinate={
-                {
-                  latitude: Number(room.location.coordinates.lat),
-                  longitude: Number(room.location.coordinates.lng),
+          <If condition={!this.props.data.loading}>
+            {this.state.rooms.map((room, index) => (
+              <MapView.Marker
+                key={`${room.siteid}-${room.roomid}-${room.classification}`}
+                coordinate={
+                  {
+                    latitude: Number(room.location.coordinates.lat),
+                    longitude: Number(room.location.coordinates.lng),
+                  }
                 }
-              }
-              pinColor={isRoomLocationEqual(room, this.state.roomInFocus) ? '#FF0000' : '#000000'}
-              title={room.roomname}
-              ref={ref => this.setMarkerRef(ref, index)}
-            />
-          ))}
-          <If condition={this.state.coordsToRoomInFocus}>
-            <MapView.Polyline
-              coordinates={this.state.coordsToRoomInFocus}
-              strokeWidth={2}
-              strokeColor="red"
-            />
+                pinColor={isRoomLocationEqual(room, this.state.roomInFocus) ? '#FF0000' : '#000000'}
+                title={room.roomname}
+                ref={ref => this.setMarkerRef(ref, index)}
+              />
+            ))}
+            <If condition={this.state.coordsToRoomInFocus}>
+              <MapView.Polyline
+                coordinates={this.state.coordsToRoomInFocus}
+                strokeWidth={2}
+                strokeColor="red"
+              />
+            </If>
           </If>
         </MapView>
-        <Animated.ScrollView
-          horizontal
-          scrollEventThrottle={1}
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={CARD_WIDTH} // investigate snapToAlignment
-          onScroll={Animated.event(
-            [
-              {
-                nativeEvent: {
-                  contentOffset: {
-                    x: this.animation,
+        <Choose>
+          <When condition={this.props.data.loading}>
+            <View style={styles.scrollView}>
+              <ActivityIndicator size="large" color="#8e1c1c" />
+            </View>
+          </When>
+          <Otherwise>
+            <Animated.ScrollView
+              horizontal
+              scrollEventThrottle={1}
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={CARD_WIDTH} // investigate snapToAlignment
+              onScroll={Animated.event(
+                [
+                  {
+                    nativeEvent: {
+                      contentOffset: {
+                        x: this.animation,
+                      },
+                    },
                   },
-                },
-              },
-            ],
-            { useNativeDriver: true },
-          )}
-          style={styles.scrollView}
-          contentContainerStyle={styles.endPadding}
-        >
-          {this.state.rooms.map((room, index) => (
-            <Card style={[styles.nativeCard, index === 0 ? styles.firstCard : null]} key={`${room.siteid}-${room.roomid}-${room.classification}`}>
-              <CardItem>
-                <Body>
-                  <Text style={styles.cardTitle}>{room.roomname}</Text>
-                  <Diary room={room} />
-                </Body>
-              </CardItem>
-            </Card>
-          ))}
-        </Animated.ScrollView>
+                ],
+                { useNativeDriver: true },
+              )}
+              style={styles.scrollView}
+              contentContainerStyle={styles.endPadding}
+            >
+              {this.state.rooms.map((room, index) => (
+                <Card style={[styles.nativeCard, index === 0 ? styles.firstCard : null]} key={`${room.siteid}-${room.roomid}-${room.classification}`}>
+                  <CardItem>
+                    <Body>
+                      <Text style={styles.cardTitle}>{room.roomname}</Text>
+                      <Diary room={room} />
+                    </Body>
+                  </CardItem>
+                </Card>
+              ))}
+            </Animated.ScrollView>
+          </Otherwise>
+        </Choose>
       </View>
     );
   }
