@@ -13,6 +13,9 @@ RUN apk add --no-cache tzdata && \
 RUN apk add postgresql-libs && \
     apk add --virtual .build-deps gcc musl-dev postgresql-dev
 
+# Get bash installed
+RUN apk add bash
+
 # Copy everything to the image
 COPY . .
 WORKDIR src/
