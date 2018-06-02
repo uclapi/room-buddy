@@ -27,4 +27,4 @@ ENV LANG C.UTF-8
 RUN pipenv install --system
 
 # Run migrations and start channels layer and backend worker in parallel
-CMD /bin/bash -c "python3 server/manage.py migrate && gunicorn --pythonpath server server.wsgi --bind 0.0.0.0:80 --loglevel=info"
+CMD /bin/bash -c "python3 server/manage.py migrate && gunicorn --pythonpath server server.wsgi --bind 0.0.0.0:80 --log-level=info"
