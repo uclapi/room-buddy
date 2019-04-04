@@ -18,7 +18,6 @@ RUN apk add bash
 
 # Copy everything to the image
 COPY . .
-WORKDIR src/
 
 # Install Pipenv and gets requirements installed
 RUN pip3 install pipenv
